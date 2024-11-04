@@ -12,7 +12,7 @@ JENKINS_TOKEN = os.getenv('JENKINS_TOKEN')
 
 intents = discord.Intents.default()
 intents.message_content = True
-client = discord.client(intents=intents)
+client = discord.Client(intents=intents)
 
 @client.event
 async def on_ready():
@@ -25,7 +25,7 @@ async def on_message(message):
     if message.channel.id != 1302880514608468070:
         return
     send_channel = client.get_channel(1302880514608468070)
-    if message.contest.startswith('!over'):
+    if message.content.startswith('!over'):
         response = requests.post(
             JENKINS_OVERURL,
             auth=(JENKINS_USER,JENKINS_TOKEN)
