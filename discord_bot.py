@@ -19,30 +19,30 @@ intents.message_content = True
 client = discord.Client(intents=intents)
 
 async def check_pipeline_status(url, channel, pipeline_name):
-    while True:
-        response = requests.get(
+    response = requests.get(
             url,
             auth=(JENKINS_USER, JENKINS_TOKEN)
         )
-        if response.status_code == 200:
-            data = response.json()
-            result = data.get('result')
-            print(f"DEBUG: 파이프라인 상태 확인 - {data}")  # 디버깅용 출력
-            if result == 'SUCCESS':
-                await channel.send(f"{pipeline_name} 파이프라인 배포 성공")
-                break
-            elif result == 'FAILURE':
-                await channel.send(f"{pipeline_name} 파이프라인 배포 실패")
-                break
-            elif result == 'ABORTED':
-                await channel.send(f"{pipeline_name} 파이프라인이 중단되었습니다")
-                break
+    if response.status_code == 200:
+        data = response.json()
+        result = data.get('result')
+        while True:
+                print(f"DEBUG: 파이프라인 상태 확인 - {data}")  # 디버깅용 출력
+                if result == 'SUCCESS':
+                    await channel.send(f"{pipeline_name} 파이프라인 배포 성공")
+                    break
+                elif result == 'FAILURE':
+                    await channel.send(f"{pipeline_name} 파이프라인 배포 실패")
+                    break
+                elif result == 'ABORTED':
+                    await channel.send(f"{pipeline_name} 파이프라인이 중단되었습니다")
+                    break
+                else:
+                    # 아직 빌드가 진행 중인 경우
+                    await asyncio.sleep(15)
             else:
-                # 아직 빌드가 진행 중인 경우
-                await asyncio.sleep(15)
-        else:
-            await channel.send("파이프라인 상태를 가져오지 못했습니다")
-            break
+                await channel.send("파이프라인 상태를 가져오지 못했습니다")
+                break
 
 @client.event
 async def on_ready():
