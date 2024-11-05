@@ -62,7 +62,7 @@ async def on_message(message):
         if response.status_code == 201:
             await message.channel.send("OVER 파이프라인이 실행되었습니다. 상태를 확인 중입니다...")
             # 상태 확인 함수 호출
-            asyncio.create_task(check_pipeline_status(JENKIS_OVERCHECKURL, message.channel, "OVER"))
+            asyncio.create_task(check_pipeline_status(JNEKINS_OVERCHECKURL, message.channel, "OVER"))
         else:
             await message.channel.send(f"{response.status_code} 에러가 발생하였습니다")
     elif message.content.startswith('!test'):
