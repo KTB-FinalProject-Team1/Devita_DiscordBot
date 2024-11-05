@@ -16,15 +16,23 @@ intents = discord.Intents.default()
 intents.message_content = True
 client = discord.Client(intents=intents)
 
-def get_current_build_number(jobName):
-    url = f"http://localhost:8080/job/{jobName}/api/json"
+def get_current_build_number():
+    # Job의 전체 빌드 목록을 가져옴
+    url = f"{JENKINS_URL}/job/{JOB_NAME}/api/json"
     response = requests.get(url, auth=(JENKINS_USER, JENKINS_TOKEN))
     if response.status_code == 200:
         data = response.json()
         for build in data['builds']:
-            if build['building']:
-                return build['number']  # 현재 실행 중인 빌드 번호 반환
+            build_number = build['number']
+            # 개별 빌드의 상세 정보에서 building 상태 확인
+            build_url = f"{JENKINS_URL}/job/{JOB_NAME}/{build_number}/api/json"
+            build_response = requests.get(build_url, auth=(JENKINS_USER, JENKINS_TOKEN))
+            if build_response.status_code == 200:
+                build_data = build_response.json()
+                if build_data.get('building', False):  # 현재 빌드가 진행 중인 경우
+                    return build_number
     return None  # 실행 중인 빌드가 없을 경우
+
 
 async def check_pipeline_status(channel, pipeline_name):
     builNum = get_current_build_number(pipeline_name) 
