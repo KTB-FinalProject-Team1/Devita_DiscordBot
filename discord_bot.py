@@ -30,17 +30,26 @@ async def on_message(message):
             JENKINS_OVERURL,
             auth=(JENKINS_USER,JENKINS_TOKEN)
         )
-        if response.status_code == 201:
-            await send_channel.send('테스트 서버들 중지 완료')
-        else:
-            await send_channel.send(f"{response.status_code}애러가 발생했습니다")
+        while True:
+            pipeLineStatus = requests.get(JENKINS_OVERURL,auth=(JENKINS_USER,JENKINS_TOKEN))
+            data = pipeLineStatus.json()
+            if data['result'] == 'SUCCESS':
+                await send_channel.send("Test 파이프라인 배포 성공")
+            else:
+                await send_channel.send("에러가 발생하였습니다")
+            time.sleep(30)
     if message.content.startswith('!test'):
+        await message.channel.send("파이프라인 실행 중...")
         response = requests.post(
             JENKINS_CDURL,
             auth=(JENKINS_USER,JENKINS_TOKEN)
         )
-        if response.status_code == 201:
-            await send_channel.send("Test 파이프라인 배포 성공")
-        else:
-            await send_channel.send(f"{response.status_code}에러가 발생하였습니다")
+        while True:
+            pipeLineStatus = requests.get(JENKINS_CDURL,auth=(JENKINS_USER,JENKINS_TOKEN))
+            data = pipeLineStatus.json()
+            if data['result'] == 'SUCCESS':
+                await send_channel.send("Test 파이프라인 배포 성공")
+            else:
+                await send_channel.send("에러가 발생하였습니다")
+            time.sleep(30)
 client.run(DISCORD_TOKEN)
