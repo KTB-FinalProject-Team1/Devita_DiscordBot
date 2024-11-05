@@ -26,6 +26,7 @@ async def on_message(message):
         return
     send_channel = client.get_channel(1302880514608468070)
     if message.content.startswith('!over'):
+        await message.channel.send("OVER 파이프라인 실행 중...")
         response = requests.post(
             JENKINS_OVERURL,
             auth=(JENKINS_USER,JENKINS_TOKEN)
@@ -34,12 +35,12 @@ async def on_message(message):
             pipeLineStatus = requests.get(JENKINS_OVERURL,auth=(JENKINS_USER,JENKINS_TOKEN))
             data = pipeLineStatus.json()
             if data['result'] == 'SUCCESS':
-                await send_channel.send("Test 파이프라인 배포 성공")
+                await send_channel.send("OVER 파이프라인 배포 성공")
             else:
                 await send_channel.send("에러가 발생하였습니다")
             time.sleep(30)
     if message.content.startswith('!test'):
-        await message.channel.send("파이프라인 실행 중...")
+        await message.channel.send("CD 파이프라인 실행 중...")
         response = requests.post(
             JENKINS_CDURL,
             auth=(JENKINS_USER,JENKINS_TOKEN)
@@ -48,7 +49,7 @@ async def on_message(message):
             pipeLineStatus = requests.get(JENKINS_CDURL,auth=(JENKINS_USER,JENKINS_TOKEN))
             data = pipeLineStatus.json()
             if data['result'] == 'SUCCESS':
-                await send_channel.send("Test 파이프라인 배포 성공")
+                await send_channel.send("CD 파이프라인 배포 성공")
             else:
                 await send_channel.send("에러가 발생하였습니다")
             time.sleep(30)
