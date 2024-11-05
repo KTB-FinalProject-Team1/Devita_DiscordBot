@@ -27,6 +27,7 @@ async def check_pipeline_status(url, channel, pipeline_name):
         if response.status_code == 200:
             data = response.json()
             result = data.get('result')
+            print(f"DEBUG: 파이프라인 상태 확인 - {result}")  # 디버깅용 출력
             if result == 'SUCCESS':
                 await channel.send(f"{pipeline_name} 파이프라인 배포 성공")
                 break
