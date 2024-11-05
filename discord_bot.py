@@ -42,7 +42,6 @@ async def check_pipeline_status(url, channel, pipeline_name):
                     await asyncio.sleep(15)
     else:
         await channel.send("파이프라인 상태를 가져오지 못했습니다")
-        break
 
 @client.event
 async def on_ready():
