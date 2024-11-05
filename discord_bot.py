@@ -40,9 +40,9 @@ async def check_pipeline_status(url, channel, pipeline_name):
                 else:
                     # 아직 빌드가 진행 중인 경우
                     await asyncio.sleep(15)
-            else:
-                await channel.send("파이프라인 상태를 가져오지 못했습니다")
-                break
+    else:
+        await channel.send("파이프라인 상태를 가져오지 못했습니다")
+        break
 
 @client.event
 async def on_ready():
