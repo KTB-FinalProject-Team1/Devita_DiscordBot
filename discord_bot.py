@@ -10,8 +10,6 @@ JENKINS_CDURL = os.getenv('JENKINS_CDURL')  # 파이프라인 트리거 URL
 JENKINS_OVERURL = os.getenv('JENKINS_OVERURL')  # 파이프라인 트리거 URL
 JENKINS_USER = os.getenv('JENKINS_USER')
 JENKINS_TOKEN = os.getenv('JENKINS_TOKEN')
-JENKINS_CDCHECKURL = os.getenv('JENKINS_CDCHECKURL')
-JNEKINS_OVERCHECKURL = os.getenv('JENKIS_OVERCHECKURL')
 
 
 intents = discord.Intents.default()
