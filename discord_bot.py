@@ -22,6 +22,7 @@ def get_current_build_number(jobName):
     response = requests.get(url, auth=(JENKINS_USER, JENKINS_TOKEN))
     if response.status_code == 200:
         data = response.json()
+        print(f"DEBUG: 파이프라인 내용 - {data}")
         for build in data['builds']:
             build_number = build['number']
             # 개별 빌드의 상세 정보에서 building 상태 확인
@@ -37,7 +38,7 @@ def get_current_build_number(jobName):
 async def check_pipeline_status(channel, pipeline_name):
     builNum = get_current_build_number(pipeline_name) 
     print(f"DEBUG: 현재 빌드 번호 - {builNum}")
-    realURL = "http://localhost:8080/job/"+pipeline_name+f"/{builNum}"+"/api/json"
+    realURL = "http://localhost:8080/job/"+pipeline_name+f"/{builNum}/api/json"
     print(f"DEBUG: 요청 URL - {realURL}")
     while True:
         response = requests.get(
