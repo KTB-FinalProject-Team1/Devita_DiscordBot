@@ -1,6 +1,7 @@
 import discord
 import requests
 import os
+import time
 import asyncio  # asyncio 모듈 추가
 from dotenv import load_dotenv
 
@@ -27,7 +28,7 @@ def get_current_build_number(jobName):
             if data.get('building',False):
                 return data['number']
         print(f"DEBUG: 번호가져오기 시도 {i+1} 번")
-        time.sleep(15)
+        time.sleep(10)
     return None  # 실행 중인 빌드가 없을 경우
 
 
