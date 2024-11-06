@@ -18,20 +18,16 @@ client = discord.Client(intents=intents)
 
 def get_current_build_number(jobName):
     # Job의 전체 빌드 목록을 가져옴
-    url = f"http://localhost:8080/job/{jobName}/api/json"
-    response = requests.get(url, auth=(JENKINS_USER, JENKINS_TOKEN))
-    if response.status_code == 200:
-        data = response.json()
-        print(f"DEBUG: 파이프라인 내용 - {data}")
-        for build in data['builds']:
-            build_number = build['number']
-            # 개별 빌드의 상세 정보에서 building 상태 확인
-            build_url = f"http://localhost:8080/job/{jobName}/{build_number}/api/json"
-            build_response = requests.get(build_url, auth=(JENKINS_USER, JENKINS_TOKEN))
-            if build_response.status_code == 200:
-                build_data = build_response.json()
-                if build_data.get('building', False):  # 현재 빌드가 진행 중인 경우
-                    return build_number
+    for i in range(5): #5번 반복
+        url = f"http://localhost:8080/job/{jobName}/lastBuild/api/json"
+        response = requests.get(url, auth=(JENKINS_USER, JENKINS_TOKEN))
+        if response.status_code == 200:
+            data = response.json()
+            print(f"DEBUG: 파이프라인 내용 - {data}")
+            if data.get('building',False):
+                return data['number']
+        print(f"DEBUG: 번호가져오기 시도 {i+1} 번")
+        time.sleep(15)
     return None  # 실행 중인 빌드가 없을 경우
 
 
