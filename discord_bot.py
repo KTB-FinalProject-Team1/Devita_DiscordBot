@@ -119,7 +119,7 @@ class PipelineView(discord.ui.View):
         else:
             await interaction.channel.send(f"Back 파이프라인 실행 실패. 에러 코드: {response.status_code}")
     
-    @discord.ui.button(label="Front 재빌드", style=discord.ButtonStyle.link)
+    @discord.ui.button(label="Front 재빌드", style=discord.ButtonStyle.primary)
     async def front_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message("Front 파이프라인 실행 중...")
         response = requests.post(
