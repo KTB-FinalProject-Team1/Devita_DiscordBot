@@ -21,7 +21,7 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 def get_current_build_number(jobName):
-    for i in range(5):  # 최대 5번 재시도
+    for i in range(10):  # 최대 10번 재시도
         url = f"http://localhost:8080/job/{jobName}/lastBuild/api/json"
         response = requests.get(url, auth=(JENKINS_USER, JENKINS_TOKEN))
         if response.status_code == 200:
@@ -30,7 +30,7 @@ def get_current_build_number(jobName):
             if data.get('building', False):
                 return data['number']
         print(f"DEBUG: 번호 가져오기 시도 {i + 1} 번")
-        time.sleep(10)
+        time.sleep(15)
     return None
 
 async def check_pipeline_status(channel, pipeline_name):
@@ -102,7 +102,7 @@ class PipelineView(discord.ui.View):
         )
         if response.status_code == 201:
             await interaction.channel.send("AI 파이프라인이 실행되었습니다. 상태를 확인 중입니다...")
-            asyncio.create_task(check_pipeline_status(interaction.channel, "testOver_pipeline"))
+            asyncio.create_task(check_pipeline_status(interaction.channel, "ai_pipeline"))
         else:
             await interaction.channel.send(f"AI 파이프라인 실행 실패. 에러 코드: {response.status_code}")
 
@@ -115,7 +115,7 @@ class PipelineView(discord.ui.View):
         )
         if response.status_code == 201:
             await interaction.channel.send("Back 파이프라인이 실행되었습니다. 상태를 확인 중입니다...")
-            asyncio.create_task(check_pipeline_status(interaction.channel, "testOver_pipeline"))
+            asyncio.create_task(check_pipeline_status(interaction.channel, "back_pipeline"))
         else:
             await interaction.channel.send(f"Back 파이프라인 실행 실패. 에러 코드: {response.status_code}")
     
@@ -128,7 +128,7 @@ class PipelineView(discord.ui.View):
         )
         if response.status_code == 201:
             await interaction.channel.send("Front 파이프라인이 실행되었습니다. 상태를 확인 중입니다...")
-            asyncio.create_task(check_pipeline_status(interaction.channel, "testOver_pipeline"))
+            asyncio.create_task(check_pipeline_status(interaction.channel, "front_new_pipeline"))
         else:
             await interaction.channel.send(f"Front 파이프라인 실행 실패. 에러 코드: {response.status_code}")
 @bot.event
