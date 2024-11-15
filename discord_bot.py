@@ -10,6 +10,9 @@ load_dotenv()
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 JENKINS_CDURL = os.getenv('JENKINS_CDURL')  # CD 파이프라인 URL
 JENKINS_OVERURL = os.getenv('JENKINS_OVERURL')  # OVER 파이프라인 URL
+JENKINS_AIURL = os.getenv('JENKINS_AIURL')
+JENKINS_BACKURL = os.getenv('JENKINS_BACKURL')
+JENKINS_FRONTURL = os.getenv('JENKINS_FRONTURL')
 JENKINS_USER = os.getenv('JENKINS_USER')
 JENKINS_TOKEN = os.getenv('JENKINS_TOKEN')
 
@@ -49,10 +52,10 @@ async def check_pipeline_status(channel, pipeline_name):
             result = data.get('result')
             print(f"DEBUG: 파이프라인 상태 확인 - {data}")
             if result == 'SUCCESS':
-                await channel.send(f"{pipeline_name} 파이프라인 배포 성공")
+                await channel.send(f"{pipeline_name} 파이프라인 성공")
                 break
             elif result == 'FAILURE':
-                await channel.send(f"{pipeline_name} 파이프라인 배포 실패")
+                await channel.send(f"{pipeline_name} 파이프라인 실패")
                 break
             elif result == 'ABORTED':
                 await channel.send(f"{pipeline_name} 파이프라인이 중단되었습니다")
@@ -64,7 +67,7 @@ async def check_pipeline_status(channel, pipeline_name):
             break
 
 class PipelineView(discord.ui.View):
-    @discord.ui.button(label="cd_pipeline", style=discord.ButtonStyle.green)
+    @discord.ui.button(label="테스트 배포", style=discord.ButtonStyle.green)
     async def cd_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message("CD 파이프라인 실행 중...")
         response = requests.post(
@@ -77,7 +80,7 @@ class PipelineView(discord.ui.View):
         else:
             await interaction.channel.send(f"CD 파이프라인 실행 실패. 에러 코드: {response.status_code}")
 
-    @discord.ui.button(label="over_pipeline", style=discord.ButtonStyle.blurple)
+    @discord.ui.button(label="테스트 종료", style=discord.ButtonStyle.blurple)
     async def over_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message("OVER 파이프라인 실행 중...")
         response = requests.post(
@@ -90,6 +93,44 @@ class PipelineView(discord.ui.View):
         else:
             await interaction.channel.send(f"OVER 파이프라인 실행 실패. 에러 코드: {response.status_code}")
 
+    @discord.ui.button(label="Ai 재빌드", style=discord.ButtonStyle.blurple)
+    async def over_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message("AI 파이프라인 실행 중...")
+        response = requests.post(
+            JENKINS_AIURL,
+            auth=(JENKINS_USER, JENKINS_TOKEN)
+        )
+        if response.status_code == 201:
+            await interaction.channel.send("AI 파이프라인이 실행되었습니다. 상태를 확인 중입니다...")
+            asyncio.create_task(check_pipeline_status(interaction.channel, "testOver_pipeline"))
+        else:
+            await interaction.channel.send(f"AI 파이프라인 실행 실패. 에러 코드: {response.status_code}")
+
+    @discord.ui.button(label="Back 재빌드", style=discord.ButtonStyle.blurple)
+    async def over_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message("Back 파이프라인 실행 중...")
+        response = requests.post(
+            JENKINS_BACKURL,
+            auth=(JENKINS_USER, JENKINS_TOKEN)
+        )
+        if response.status_code == 201:
+            await interaction.channel.send("Back 파이프라인이 실행되었습니다. 상태를 확인 중입니다...")
+            asyncio.create_task(check_pipeline_status(interaction.channel, "testOver_pipeline"))
+        else:
+            await interaction.channel.send(f"Back 파이프라인 실행 실패. 에러 코드: {response.status_code}")
+    
+    @discord.ui.button(label="Front 재빌드", style=discord.ButtonStyle.blurple)
+    async def over_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message("Front 파이프라인 실행 중...")
+        response = requests.post(
+            JENKINS_AIURL,
+            auth=(JENKINS_USER, JENKINS_TOKEN)
+        )
+        if response.status_code == 201:
+            await interaction.channel.send("Front 파이프라인이 실행되었습니다. 상태를 확인 중입니다...")
+            asyncio.create_task(check_pipeline_status(interaction.channel, "testOver_pipeline"))
+        else:
+            await interaction.channel.send(f"Front 파이프라인 실행 실패. 에러 코드: {response.status_code}")
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user}")
