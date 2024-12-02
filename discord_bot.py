@@ -152,7 +152,7 @@ class PipelineView(discord.ui.View):
             await interaction.channel.send(f"배포 파이프라인 실행 실패. 에러 코드: {response.status_code}")
 
     @discord.ui.button(label="배포중단", style=discord.ButtonStyle.danger)
-    async def deploy_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def deployOver_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message("배포 중단 중...")
         response = requests.post(
             JENKINS_DEPLOYOVERURL,
@@ -165,7 +165,7 @@ class PipelineView(discord.ui.View):
             await interaction.channel.send(f"배포중단 파이프라인 실행 실패. 에러 코드: {response.status_code}")
 
     @discord.ui.button(label="Back 재배포", style=discord.ButtonStyle.danger)
-    async def deploy_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def deployBack_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message("Back 재배포 중...")
         response = requests.post(
             JENKINS_BACKDEPLOYURL,
@@ -178,7 +178,7 @@ class PipelineView(discord.ui.View):
             await interaction.channel.send(f"Back 재배포 파이프라인 실행 실패. 에러 코드: {response.status_code}")
 
     @discord.ui.button(label="AI 재배포", style=discord.ButtonStyle.danger)
-    async def deploy_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def deployAi_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message("AI 재배포 중...")
         response = requests.post(
             JENKINS_AIDEPLOYURL,
