@@ -126,10 +126,10 @@ class PipelineView(discord.ui.View):
             await interaction.channel.send(f"Back 파이프라인 실행 실패. 에러 코드: {response.status_code}")
     
     @discord.ui.button(label="Front Test 재빌드", style=discord.ButtonStyle.green)
-    async def front_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def frontTest_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message("Front 파이프라인 실행 중...")
         response = requests.post(
-            JENKINS_AIURL,
+            JENKINS_FRONTURL,
             auth=(JENKINS_USER, JENKINS_TOKEN)
         )
         if response.status_code == 201:
@@ -138,18 +138,58 @@ class PipelineView(discord.ui.View):
         else:
             await interaction.channel.send(f"Front 파이프라인 실행 실패. 에러 코드: {response.status_code}")
     
-    @discord.ui.button(label="배포", style=style=discord.ButtonStyle.danger)
-    async def front_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+    @discord.ui.button(label="배포", style=discord.ButtonStyle.danger)
+    async def deploy_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message("배포 중...")
         response = requests.post(
-            JENKINS_AIURL,
+            JENKINS_DEPLOYURL,
             auth=(JENKINS_USER, JENKINS_TOKEN)
         )
         if response.status_code == 201:
-            await interaction.channel.send("Front 파이프라인이 실행되었습니다. 상태를 확인 중입니다...")
+            await interaction.channel.send("배포 파이프라인이 실행되었습니다. 상태를 확인 중입니다...")
             asyncio.create_task(check_pipeline_status(interaction.channel, "front_new_pipeline"))
         else:
-            await interaction.channel.send(f"Front 파이프라인 실행 실패. 에러 코드: {response.status_code}")
+            await interaction.channel.send(f"배포 파이프라인 실행 실패. 에러 코드: {response.status_code}")
+
+    @discord.ui.button(label="배포중단", style=discord.ButtonStyle.danger)
+    async def deploy_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message("배포 중단 중...")
+        response = requests.post(
+            JENKINS_DEPLOYOVERURL,
+            auth=(JENKINS_USER, JENKINS_TOKEN)
+        )
+        if response.status_code == 201:
+            await interaction.channel.send("배포중단 파이프라인이 실행되었습니다. 상태를 확인 중입니다...")
+            asyncio.create_task(check_pipeline_status(interaction.channel, "front_new_pipeline"))
+        else:
+            await interaction.channel.send(f"배포중단 파이프라인 실행 실패. 에러 코드: {response.status_code}")
+
+    @discord.ui.button(label="Back 재배포", style=discord.ButtonStyle.danger)
+    async def deploy_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message("Back 재배포 중...")
+        response = requests.post(
+            JENKINS_BACKDEPLOYURL,
+            auth=(JENKINS_USER, JENKINS_TOKEN)
+        )
+        if response.status_code == 201:
+            await interaction.channel.send("Back 재배포 파이프라인이 실행되었습니다. 상태를 확인 중입니다...")
+            asyncio.create_task(check_pipeline_status(interaction.channel, "front_new_pipeline"))
+        else:
+            await interaction.channel.send(f"Back 재배포 파이프라인 실행 실패. 에러 코드: {response.status_code}")
+
+    @discord.ui.button(label="AI 재배포", style=discord.ButtonStyle.danger)
+    async def deploy_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message("AI 재배포 중...")
+        response = requests.post(
+            JENKINS_AIDEPLOYURL,
+            auth=(JENKINS_USER, JENKINS_TOKEN)
+        )
+        if response.status_code == 201:
+            await interaction.channel.send("AI 재배포 파이프라인이 실행되었습니다. 상태를 확인 중입니다...")
+            asyncio.create_task(check_pipeline_status(interaction.channel, "front_new_pipeline"))
+        else:
+            await interaction.channel.send(f"AI 재배포 파이프라인 실행 실패. 에러 코드: {response.status_code}")
+
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user}")
