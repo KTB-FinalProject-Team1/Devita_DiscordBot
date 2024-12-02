@@ -13,6 +13,12 @@ JENKINS_OVERURL = os.getenv('JENKINS_OVERURL')  # OVER 파이프라인 URL
 JENKINS_AIURL = os.getenv('JENKINS_AIURL')
 JENKINS_BACKURL = os.getenv('JENKINS_BACKURL')
 JENKINS_FRONTURL = os.getenv('JENKINS_FRONTURL')
+
+JENKINS_DEPLOYURL = os.getenv('JENKINS_DEPLOYURL')
+JENKINS_DEPLOYOVERURL = os.getenv('JENKINS_DEPLOYOVERURL')
+JENKINS_AIDEPLOYURL = os.getenv('JENKINS_AIDEPLOYURL')
+JENKINS_BACKDEPLOYURL = os.getenv('JENKINS_BACKDEPLOYURL')
+
 JENKINS_USER = os.getenv('JENKINS_USER')
 JENKINS_TOKEN = os.getenv('JENKINS_TOKEN')
 
@@ -80,7 +86,7 @@ class PipelineView(discord.ui.View):
         else:
             await interaction.channel.send(f"CD 파이프라인 실행 실패. 에러 코드: {response.status_code}")
 
-    @discord.ui.button(label="테스트 종료", style=discord.ButtonStyle.blurple)
+    @discord.ui.button(label="테스트 종료", style=discord.ButtonStyle.green)
     async def over_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message("OVER 파이프라인 실행 중...")
         response = requests.post(
@@ -93,7 +99,7 @@ class PipelineView(discord.ui.View):
         else:
             await interaction.channel.send(f"OVER 파이프라인 실행 실패. 에러 코드: {response.status_code}")
 
-    @discord.ui.button(label="Ai 재빌드", style=discord.ButtonStyle.secondary)
+    @discord.ui.button(label="Ai Test 재빌드", style=discord.ButtonStyle.green)
     async def ai_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message("AI 파이프라인 실행 중...")
         response = requests.post(
@@ -106,7 +112,7 @@ class PipelineView(discord.ui.View):
         else:
             await interaction.channel.send(f"AI 파이프라인 실행 실패. 에러 코드: {response.status_code}")
 
-    @discord.ui.button(label="Back 재빌드", style=discord.ButtonStyle.danger)
+    @discord.ui.button(label="Back Test 재빌드", style=discord.ButtonStyle.green)
     async def back_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message("Back 파이프라인 실행 중...")
         response = requests.post(
@@ -119,9 +125,22 @@ class PipelineView(discord.ui.View):
         else:
             await interaction.channel.send(f"Back 파이프라인 실행 실패. 에러 코드: {response.status_code}")
     
-    @discord.ui.button(label="Front 재빌드", style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="Front Test 재빌드", style=discord.ButtonStyle.green)
     async def front_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message("Front 파이프라인 실행 중...")
+        response = requests.post(
+            JENKINS_AIURL,
+            auth=(JENKINS_USER, JENKINS_TOKEN)
+        )
+        if response.status_code == 201:
+            await interaction.channel.send("Front 파이프라인이 실행되었습니다. 상태를 확인 중입니다...")
+            asyncio.create_task(check_pipeline_status(interaction.channel, "front_new_pipeline"))
+        else:
+            await interaction.channel.send(f"Front 파이프라인 실행 실패. 에러 코드: {response.status_code}")
+    
+    @discord.ui.button(label="배포", style=style=discord.ButtonStyle.danger)
+    async def front_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message("배포 중...")
         response = requests.post(
             JENKINS_AIURL,
             auth=(JENKINS_USER, JENKINS_TOKEN)
