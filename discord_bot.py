@@ -82,7 +82,7 @@ class PipelineView(discord.ui.View):
         )
         if response.status_code == 201:
             await interaction.channel.send("CD 파이프라인이 실행되었습니다. 상태를 확인 중입니다...")
-            asyncio.create_task(check_pipeline_status(interaction.channel, "cd_pipeline"))
+            asyncio.create_task(check_pipeline_status(interaction.channel, "cd_pipeline_test"))
         else:
             await interaction.channel.send(f"CD 파이프라인 실행 실패. 에러 코드: {response.status_code}")
 
@@ -95,7 +95,7 @@ class PipelineView(discord.ui.View):
         )
         if response.status_code == 201:
             await interaction.channel.send("OVER 파이프라인이 실행되었습니다. 상태를 확인 중입니다...")
-            asyncio.create_task(check_pipeline_status(interaction.channel, "testOver_pipeline"))
+            asyncio.create_task(check_pipeline_status(interaction.channel, "testOver_pipeline_test"))
         else:
             await interaction.channel.send(f"OVER 파이프라인 실행 실패. 에러 코드: {response.status_code}")
 
@@ -108,7 +108,7 @@ class PipelineView(discord.ui.View):
         )
         if response.status_code == 201:
             await interaction.channel.send("AI 파이프라인이 실행되었습니다. 상태를 확인 중입니다...")
-            asyncio.create_task(check_pipeline_status(interaction.channel, "ai_pipeline"))
+            asyncio.create_task(check_pipeline_status(interaction.channel, "ai_pipeline_test"))
         else:
             await interaction.channel.send(f"AI 파이프라인 실행 실패. 에러 코드: {response.status_code}")
 
@@ -121,7 +121,7 @@ class PipelineView(discord.ui.View):
         )
         if response.status_code == 201:
             await interaction.channel.send("Back 파이프라인이 실행되었습니다. 상태를 확인 중입니다...")
-            asyncio.create_task(check_pipeline_status(interaction.channel, "back_pipeline"))
+            asyncio.create_task(check_pipeline_status(interaction.channel, "back_pipeline_test"))
         else:
             await interaction.channel.send(f"Back 파이프라인 실행 실패. 에러 코드: {response.status_code}")
     
@@ -134,7 +134,7 @@ class PipelineView(discord.ui.View):
         )
         if response.status_code == 201:
             await interaction.channel.send("Front 파이프라인이 실행되었습니다. 상태를 확인 중입니다...")
-            asyncio.create_task(check_pipeline_status(interaction.channel, "front_new_pipeline"))
+            asyncio.create_task(check_pipeline_status(interaction.channel, "front_pipeline_test"))
         else:
             await interaction.channel.send(f"Front 파이프라인 실행 실패. 에러 코드: {response.status_code}")
     
@@ -147,7 +147,7 @@ class PipelineView(discord.ui.View):
         )
         if response.status_code == 201:
             await interaction.channel.send("배포 파이프라인이 실행되었습니다. 상태를 확인 중입니다...")
-            asyncio.create_task(check_pipeline_status(interaction.channel, "front_new_pipeline"))
+            asyncio.create_task(check_pipeline_status(interaction.channel, "cd_pipeline_deploy"))
         else:
             await interaction.channel.send(f"배포 파이프라인 실행 실패. 에러 코드: {response.status_code}")
 
@@ -160,7 +160,7 @@ class PipelineView(discord.ui.View):
         )
         if response.status_code == 201:
             await interaction.channel.send("배포중단 파이프라인이 실행되었습니다. 상태를 확인 중입니다...")
-            asyncio.create_task(check_pipeline_status(interaction.channel, "front_new_pipeline"))
+            asyncio.create_task(check_pipeline_status(interaction.channel, "deployOver_pipeline_deploy"))
         else:
             await interaction.channel.send(f"배포중단 파이프라인 실행 실패. 에러 코드: {response.status_code}")
 
@@ -173,7 +173,7 @@ class PipelineView(discord.ui.View):
         )
         if response.status_code == 201:
             await interaction.channel.send("Back 재배포 파이프라인이 실행되었습니다. 상태를 확인 중입니다...")
-            asyncio.create_task(check_pipeline_status(interaction.channel, "front_new_pipeline"))
+            asyncio.create_task(check_pipeline_status(interaction.channel, "back_pipeline_deploy"))
         else:
             await interaction.channel.send(f"Back 재배포 파이프라인 실행 실패. 에러 코드: {response.status_code}")
 
@@ -186,7 +186,7 @@ class PipelineView(discord.ui.View):
         )
         if response.status_code == 201:
             await interaction.channel.send("AI 재배포 파이프라인이 실행되었습니다. 상태를 확인 중입니다...")
-            asyncio.create_task(check_pipeline_status(interaction.channel, "front_new_pipeline"))
+            asyncio.create_task(check_pipeline_status(interaction.channel, "ai_pipeline_deploy"))
         else:
             await interaction.channel.send(f"AI 재배포 파이프라인 실행 실패. 에러 코드: {response.status_code}")
 
