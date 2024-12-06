@@ -5,6 +5,8 @@ import os
 import time
 import asyncio
 from dotenv import load_dotenv
+import boto3
+from botocore.exceptions import BotoCoreError, ClientError
 
 load_dotenv()
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
@@ -21,6 +23,17 @@ JENKINS_BACKDEPLOYURL = os.getenv('JENKINS_BACKDEPLOYURL')
 
 JENKINS_USER = os.getenv('JENKINS_USER')
 JENKINS_TOKEN = os.getenv('JENKINS_TOKEN')
+
+AWS_REGION = os.getenv('AWS_REGION')
+JENKINS_INSTANCE_ID = os.getenv('JENKINS_INSTANCE_ID')
+
+ec2 = boto3.client(
+    'ec2',
+    region_name=AWS_REGION,
+    aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+    aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
+)
+
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -73,6 +86,33 @@ async def check_pipeline_status(channel, pipeline_name):
             break
 
 class PipelineView(discord.ui.View):
+    @discord.ui.button(label="Jenkins 시작",style=discord.ButtonStyle.blurple)
+    async def start_jenkins_button(self,interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message("Jenkins 실행 중...")
+        try:
+            response = ec2.start_instances(InstanceIds=[JENKINS_INSTANCE_ID])
+            waiter = ec2.get_waiter('instance_running')
+            waiter.wait(InstanceIds=[JENKINS_INSTANCE_ID])
+
+            await interaction.channel.send("JENKINS 실행 완료")
+        except (BotoCoreError, ClientError) as error:
+            await interaction.channel.send(f"Jenkins 인스턴스를 시작하지 못했습니다: {error}")
+    
+    @discord.ui.button(label="Jenkins 중지", style=discord.ButtonStyle.blurple)
+    async def stop_jenkins_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message("Jenkins 인스턴스를 중지 중입니다...")
+        try:
+            # EC2 인스턴스 중지
+            response = ec2.stop_instances(InstanceIds=[JENKINS_INSTANCE_ID])
+
+            # 인스턴스 상태 확인
+            waiter = ec2.get_waiter('instance_stopped')
+            waiter.wait(InstanceIds=[JENKINS_INSTANCE_ID])
+
+            await interaction.channel.send("Jenkins 중지 완료")
+        except (BotoCoreError, ClientError) as error:
+            await interaction.channel.send(f"Jenkins 인스턴스를 중지하지 못했습니다: {error}")
+
     @discord.ui.button(label="테스트 배포", style=discord.ButtonStyle.green)
     async def cd_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message("CD 파이프라인 실행 중...")
