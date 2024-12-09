@@ -59,7 +59,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 @app.route("/jenkins",methods=["POST"])
 def jenkins_webhook():
-    data = requests.get_json()
+    data = request.get_json()
     message = data.get("message", "Jenkins에서 전송된 메시지입니다.")
     send_message_to_discord(message)
     return {"status":"Message sent"},200
@@ -77,7 +77,7 @@ def send_message_to_discord(message):
 def get_current_build_number(jobName):
     for i in range(10):  # 최대 10번 재시도
         url = f"http://3.34.246.115:8080/job/{jobName}/lastBuild/api/json"
-        response = request.get(url, auth=(JENKINS_USER, JENKINS_TOKEN))
+        response = requests.get(url, auth=(JENKINS_USER, JENKINS_TOKEN))
         if response.status_code == 200:
             data = response.json()
             print(f"DEBUG: 파이프라인 내용 - {data}")
