@@ -26,7 +26,7 @@ Thread(target=run).start()
 
 load_dotenv()
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
-DISCORD_CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))
+DISCORD_CHANNEL_ID = os.getenv('DISCORD_CHANNEL_ID')
 
 JENKINS_CDURL = os.getenv('JENKINS_CDURL')  # CD 파이프라인 URL
 JENKINS_OVERURL = os.getenv('JENKINS_OVERURL')  # OVER 파이프라인 URL
