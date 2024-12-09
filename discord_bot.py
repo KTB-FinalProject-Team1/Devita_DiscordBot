@@ -19,10 +19,15 @@ def health_check():
 def run():
     app.run(host="0.0.0.0", port=8000)
 
+
+
+
 Thread(target=run).start()
 
 load_dotenv()
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
+DISCORD_CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))
+
 JENKINS_CDURL = os.getenv('JENKINS_CDURL')  # CD 파이프라인 URL
 JENKINS_OVERURL = os.getenv('JENKINS_OVERURL')  # OVER 파이프라인 URL
 JENKINS_AIURL = os.getenv('JENKINS_AIURL')
@@ -51,6 +56,23 @@ ec2 = boto3.client(
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
+
+@app.route("/jenkins",methods=["POST"])
+def jenkins_webhook():
+    data = requests.get_json()
+    message = data.get("message", "Jenkins에서 전송된 메시지입니다.")
+    send_message_to_discord(message)
+    return {"status":"Message sent"},200
+
+async def send_discord_message(message):
+    channel = bot.get_channel(DISCORD_CHANNEL_ID)
+    if channel:
+        await channel.send(message)
+
+def send_message_to_discord(message):
+    asyncio.run(send_discord_message(message))
+
+
 
 def get_current_build_number(jobName):
     for i in range(10):  # 최대 10번 재시도
