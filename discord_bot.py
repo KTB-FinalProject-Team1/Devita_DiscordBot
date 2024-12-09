@@ -76,7 +76,7 @@ def send_message_to_discord(message):
 
 def get_current_build_number(jobName):
     for i in range(10):  # 최대 10번 재시도
-        url = f"http://localhost:8080/job/{jobName}/lastBuild/api/json"
+        url = f"http://3.34.246.115:8080/job/{jobName}/lastBuild/api/json"
         response = requests.get(url, auth=(JENKINS_USER, JENKINS_TOKEN))
         if response.status_code == 200:
             data = response.json()
@@ -93,7 +93,7 @@ async def check_pipeline_status(channel, pipeline_name):
     if not builNum:
         await channel.send(f"{pipeline_name} 실행 중인 빌드 번호를 가져오지 못했습니다.")
         return
-    realURL = f"http://localhost:8080/job/{pipeline_name}/{builNum}/api/json"
+    realURL = f"http://3.34.246.115:8080/job/{pipeline_name}/{builNum}/api/json"
     print(f"DEBUG: 요청 URL - {realURL}")
     while True:
         response = requests.get(
