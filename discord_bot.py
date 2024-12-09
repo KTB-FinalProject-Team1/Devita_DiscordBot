@@ -7,6 +7,19 @@ import asyncio
 from dotenv import load_dotenv
 import boto3
 from botocore.exceptions import BotoCoreError, ClientError
+from flask import Flask
+from threading import Thread
+
+app = Flask(__name__)
+
+@app.route("/")
+def health_check():
+    return "OK",200
+
+def run():
+    app.run(host="0.0.0.0", port=8000)
+
+Thread(target=run).start()
 
 load_dotenv()
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
