@@ -74,50 +74,67 @@ def send_message_to_discord(message):
 
 
 
-def get_current_build_number(jobName):
-    for i in range(10):  # 최대 10번 재시도
-        url = f"http://3.34.246.115:8080/job/{jobName}/lastBuild/api/json"
-        response = requests.get(url, auth=(JENKINS_USER, JENKINS_TOKEN))
-        if response.status_code == 200:
-            data = response.json()
-            print(f"DEBUG: 파이프라인 내용 - {data}")
-            if data.get('building', False):
-                return data['number']
-        print(f"DEBUG: 번호 가져오기 시도 {i + 1} 번")
-        time.sleep(15)
-    return None
-
 async def check_pipeline_status(channel, pipeline_name):
-    builNum = get_current_build_number(pipeline_name)
-    print(f"DEBUG: 현재 빌드 번호 - {builNum}")
-    if not builNum:
+    for i in range(10):  # 최대 10번 재시도
+        # Jenkins API URL
+        url = f"http://3.34.246.115:8080/job/{pipeline_name}/lastBuild/api/json"
+        try:
+            # Jenkins API 호출
+            response = requests.get(url, auth=(JENKINS_USER, JENKINS_TOKEN))
+            if response.status_code == 200:
+                data = response.json()
+                print(f"DEBUG: 파이프라인 내용 - {data}")
+                
+                # 파이프라인 상태 확인
+                if data.get('building', False):
+                    build_num = data['number']
+                    print(f"DEBUG: 현재 빌드 번호 - {build_num}")
+                    break
+            else:
+                print(f"DEBUG: Jenkins 응답 오류 {response.status_code}")
+        except requests.exceptions.RequestException as e:
+            print(f"DEBUG: Jenkins 요청 실패: {e}")
+        
+        # 재시도 대기 (비동기)
+        print(f"DEBUG: 번호 가져오기 시도 {i + 1} 번")
+        await asyncio.sleep(15)
+    else:
+        # 빌드 번호를 가져오지 못한 경우
         await channel.send(f"{pipeline_name} 실행 중인 빌드 번호를 가져오지 못했습니다.")
         return
-    realURL = f"http://3.34.246.115:8080/job/{pipeline_name}/{builNum}/api/json"
+
+    # 빌드 번호로 상태 확인
+    realURL = f"http://3.34.246.115:8080/job/{pipeline_name}/{build_num}/api/json"
     print(f"DEBUG: 요청 URL - {realURL}")
     while True:
-        response = requests.get(
-            realURL,
-            auth=(JENKINS_USER, JENKINS_TOKEN)
-        )
-        print(f"DEBUG: 응답 코드 - {response}")
-        if response.status_code == 200:
-            data = response.json()
-            result = data.get('result')
-            print(f"DEBUG: 파이프라인 상태 확인 - {data}")
-            if result == 'SUCCESS':
-                await channel.send(f"{pipeline_name} 파이프라인 성공")
-                break
-            elif result == 'FAILURE':
-                await channel.send(f"{pipeline_name} 파이프라인 실패")
-                break
-            elif result == 'ABORTED':
-                await channel.send(f"{pipeline_name} 파이프라인이 중단되었습니다")
-                break
+        try:
+            # Jenkins 빌드 상태 확인
+            response = requests.get(realURL, auth=(JENKINS_USER, JENKINS_TOKEN))
+            print(f"DEBUG: 응답 코드 - {response.status_code}")
+            if response.status_code == 200:
+                data = response.json()
+                result = data.get('result')
+                print(f"DEBUG: 파이프라인 상태 확인 - {data}")
+                
+                # 결과 처리
+                if result == 'SUCCESS':
+                    await channel.send(f"{pipeline_name} 파이프라인 성공")
+                    break
+                elif result == 'FAILURE':
+                    await channel.send(f"{pipeline_name} 파이프라인 실패")
+                    break
+                elif result == 'ABORTED':
+                    await channel.send(f"{pipeline_name} 파이프라인 중단")
+                    break
+                else:
+                    # 진행 중일 경우 대기
+                    await asyncio.sleep(15)
             else:
-                await asyncio.sleep(15)  # 진행 중인 경우 15초 대기
-        else:
-            await channel.send(f"파이프라인 상태를 가져오지 못했습니다. URL: {realURL}")
+                await channel.send(f"파이프라인 상태를 가져오지 못했습니다. URL: {realURL}")
+                break
+        except requests.exceptions.RequestException as e:
+            print(f"DEBUG: 상태 요청 실패: {e}")
+            await channel.send(f"{pipeline_name} 상태를 가져오는 중 오류가 발생했습니다.")
             break
 
 class PipelineView(discord.ui.View):
