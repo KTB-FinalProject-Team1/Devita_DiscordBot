@@ -7,7 +7,7 @@ import asyncio
 from dotenv import load_dotenv
 import boto3
 from botocore.exceptions import BotoCoreError, ClientError
-from flask import Flask
+from flask import Flask, request
 from threading import Thread
 
 app = Flask(__name__)
